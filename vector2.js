@@ -6,14 +6,14 @@ var Vector2 = function () {
 }
 
 // set the components of the vector
-Vector2.prototype.set(x, y)
+Vector2.prototype.set = function(x, y)
 {
     this.x = 10;
     this.y = 15;
 }
 
 // add two vectors together
-vector2.prototype.Add = function(otherVector)
+Vector2.prototype.Add = function(otherVector)
 {
     var newVector = new Vector2();
     newVector.set(this.x + otherVector.x, this.y + otherVector.y);
@@ -21,13 +21,13 @@ vector2.prototype.Add = function(otherVector)
 }
 
 // add subtract and multiply functions here
-vector2.prototype.Subtract = function (otherVector) {
+Vector2.prototype.Subtract = function (otherVector) {
     var newVector = new Vector2();
     newVector.set(this.x - otherVector.x, this.y - otherVector.y);
     return newVector;
 }
 
-vector2.prototype.Multiply = function (otherVector) {
+Vector2.prototype.Multiply = function (otherVector) {
     var newVector = new Vector2();
     newVector.set(this.x * otherVector.x, this.y * otherVector.y);
     return newVector;
