@@ -1,4 +1,3 @@
-
 // constructor for the vector2 object
 var Vector2 = function () {
     this.x = 0;
@@ -8,8 +7,8 @@ var Vector2 = function () {
 // set the components of the vector
 Vector2.prototype.set = function(x, y)
 {
-    this.x = canvas.width / 2;
-    this.y = canvas.height / 2;
+    this.x = x;
+    this.y = y;
 }
 
 // add two vectors together

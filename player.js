@@ -125,6 +125,8 @@ Player.prototype.update = function (deltaTime) {
         }
     }}
 
+console.log(this.position.y);
+
 Player.prototype.draw = function () {
     context.save();
     context.translate(this.x, this.y);
