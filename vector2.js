@@ -8,8 +8,8 @@ var Vector2 = function () {
 // set the components of the vector
 Vector2.prototype.set = function(x, y)
 {
-    this.x = 10;
-    this.y = 15;
+    this.x = canvas.width / 2;
+    this.y = canvas.height / 2;
 }
 
 // add two vectors together

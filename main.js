@@ -54,7 +54,7 @@ var ACCEL = MAXDX * 2;
 // horizontal friction - take 1/6 second to stop from maxdx
 var FRICTION = MAXDX * 6;
 // (a large) instantaneous jump impulse
-var JUMP = METER * 1500;
+var JUMP = METER * 1500
 
 
 
