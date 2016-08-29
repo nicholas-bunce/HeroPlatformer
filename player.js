@@ -123,9 +123,9 @@ Player.prototype.update = function (deltaTime) {
             this.position.x = tileToPixel(tx + 1);
             this.velocity.x = 0; // stop horizontal velocity
         }
-    }}
+    }
+}
 
-console.log(this.position.y);
 
 Player.prototype.draw = function () {
     context.save();
