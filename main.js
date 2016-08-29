@@ -39,6 +39,8 @@ var fps = 0;
 var fpsCount = 0;
 var fpsTime = 0;
 
+var TILE = 35;
+
 // physics
 // abitrary choice for 1m
 var METER = TILE;
@@ -69,7 +71,7 @@ var LAYER_BACKGROUND = 0;
 var LAYER_PLATFORMS = 1;
 var LAYER_LADDERS = 2;
 var MAP = { tw: 60, th: 15 };
-var TILE = 35;
+
 var TILESET_TILE = TILE * 2;
 var TILESET_PADDING = 2;
 var TILESET_SPACING = 2;
