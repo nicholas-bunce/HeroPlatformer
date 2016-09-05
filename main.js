@@ -68,11 +68,19 @@ chuckNorris.src = "hero.png";
 
 var keyboard = new Keyboard();
 
+var ENEMY_MAXDX = METER * 5;
+var ENEMY_ACCEL = ENEMY_MAXDX * 2;
+
+var enemies = [];
+
 var LAYER_COUNT = 3;
 var LAYER_BACKGROUND = 0;
 var LAYER_PLATFORMS = 1;
 var LAYER_LADDERS = 2;
 var MAP = { tw: 60, th: 15 };
+
+var LAYER_OBJECT_ENEMIES = 3;
+var LAYER_OBJECT_TRIGGERS = 4;
 
 var TILESET_TILE = TILE * 2;
 var TILESET_PADDING = 2;
@@ -81,6 +89,7 @@ var TILESET_COUNT_X = 14;
 var TILESET_COUNT_Y = 14;
 
 var player = new Player();
+var enemy = new Enemy();
 
 var heartImage = document.createElement("img");
 heartImage.src = "heartImage.png";
@@ -222,6 +231,19 @@ function initialize() {
                 isSfxPlaying = false;
             }
         });
+    // add enemies
+    idx = 0;
+    for (var y = 0; y < level1.layers[LAYER_OBJECT_ENEMIES].height; y++) {
+        for (var x = 0; x < level1.layers[LAYER_OBJECT_ENEMIES].width; x++) {
+            if (level1.layers[LAYER_OBJECT_ENEMIES].data[idx] != 0) {
+                var px = tileToPixel(x);
+                var py = tileToPixel(y);
+                var e = new Enemy(px, py);
+                enemies.push(e);
+            }
+            idx++;
+        }
+    }
 }
 
 function run() {
@@ -233,6 +255,12 @@ function run() {
     drawMap();
     player.update(deltaTime);
     player.draw();
+
+    for (var i = 0; i < enemies.length; i++)
+    {
+        enemies[i].update(deltaTime);
+    }
+    enemy.draw();
 
     context.fillStyle = "blue";
     context.font = "32px Arial";
