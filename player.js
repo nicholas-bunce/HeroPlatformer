@@ -28,7 +28,8 @@ var Player = function () {
     for (var i = 0; i < ANIM_MAX; i++)
     {
         this.sprite.setAnimationOffset(i, -55, -87);
-    }
+    }
+
     this.position = new Vector2();
     this.position.set(9 * TILE, 0 * TILE);
 
@@ -42,6 +43,7 @@ var Player = function () {
 
     this.direction = RIGHT;
 
+    this.cooldownTimer = 0;
 
 };
 
@@ -62,9 +64,19 @@ Player.prototype.update = function (deltaTime) {
     if (keyboard.isKeyDown(keyboard.KEY_RIGHT) == true) {
         right = true;
     }
-    if (keyboard.isKeyDown(keyboard.KEY_SPACE) == true) {
+    if (keyboard.isKeyDown(keyboard.KEY_UP) == true) {
         jump = true;
     }
+
+    if (this.cooldownTimer > 0)
+    {
+        this.cooldownTimer -= deltaTime;
+    }
+    if (keyboard.isKeyDown(keyboard.KEY_SPACE) == true && this.cooldownTimer <= 0) {
+        sfxFire.play();
+        this.cooldownTimer = 0.3;
+    }
+
     if (keyboard.isKeyDown(keyboard.KEY_LEFT) == true) {
         left = true;
         this.direction = LEFT;
@@ -91,7 +103,7 @@ Player.prototype.update = function (deltaTime) {
             }
       }
 }
-    if (keyboard.isKeyDown(keyboard.KEY_SPACE) == true)
+    if (keyboard.isKeyDown(keyboard.KEY_UP) == true)
     {
         jump = true;
         if (left == true) {
@@ -200,5 +212,5 @@ Player.prototype.update = function (deltaTime) {
 
 Player.prototype.draw = function ()
 {
-    this.sprite.draw(context, this.position.x, this.position.y);
+    this.sprite.draw(context, this.position.x - worldOffsetX, this.position.y);
 }
