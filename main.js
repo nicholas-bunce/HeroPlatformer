@@ -26,10 +26,21 @@ function getDeltaTime() {
     return deltaTime;
 }
 
+var STATE_SPLASH = 0;
+var STATE_GAME = 1;
+var STATE_GAMEOVER = 2;
+
+var timer = 100;
+
+var gameState = STATE_SPLASH;
+
+var splashTimer = 4;
 //-------------------- Don't modify anything above here
 
 var SCREEN_WIDTH = canvas.width;
 var SCREEN_HEIGHT = canvas.height;
+
+
 
 var score = 0;
 var lives = 3;
@@ -72,7 +83,7 @@ var ENEMY_MAXDX = METER * 5;
 var ENEMY_ACCEL = ENEMY_MAXDX * 2;
 
 var enemies = [];
-
+var bullets = [];
 var LAYER_COUNT = 3;
 var LAYER_BACKGROUND = 0;
 var LAYER_PLATFORMS = 1;
@@ -91,6 +102,9 @@ var TILESET_COUNT_Y = 14;
 var player = new Player();
 var enemy = new Enemy();
 
+var jungle = document.createElement("img");
+jungle.src = "jungle.png";
+
 var heartImage = document.createElement("img");
 heartImage.src = "heartImage.png";
 
@@ -98,6 +112,44 @@ heartImage.src = "heartImage.png";
 var tileset = document.createElement("img");
 tileset.src = "tileset.png";
 
+function runSplash(deltaTime) {
+    splashTimer -= deltaTime;
+    if (splashTimer <= 0) {
+        gameState = STATE_GAME;
+        return;
+    }
+    context.drawImage(jungle, 0, 0, canvas.width, canvas.height);
+
+
+    context.fillStyle = "#ffffff";
+    context.font = "italic 24px Arial";
+    context.fillText("Chuck Norris Returns ", 220, 240);
+    context.fillText("by ", 290, 265);
+    context.fillText("Nicholas Bunce ", 220, 290);
+
+}
+
+var splashTwo = document.createElement("img");
+splashTwo.src = "splashtwo.png"
+
+var splashTimerTwo = 500;
+function runGameOver(deltaTime) {
+    splashTimerTwo -= deltaTime;
+
+    context.drawImage(splashTwo, 0, 0, canvas.width, canvas.height);
+
+    if (lives == 0) {
+        context.fillStyle = "#ff0000";
+        context.font = "bold 24px Arial";
+        context.fillText("You lost your lives....", 200, 200);
+    }
+    if (timer < 0) {
+        context.fillstyle = "#ff0000";
+        context.font = "bold 24px Arial";
+        context.fillText("Your time has run out!", 200, 200);
+    }
+    musicBackground.stop();
+}
 function cellAtPixelCoord(layer, x, y) {
     if (x < 0 || x > SCREEN_WIDTH || y<0)
         return 1;
@@ -215,7 +267,7 @@ function initialize() {
 
     musicBackground = new Howl(
         {
-            urls: ["background.ogg"],
+            urls: ["background2.ogg"],
             loop: true,
             buffer: true,
             volume: 0.5
@@ -245,7 +297,15 @@ function initialize() {
         }
     }
 }
-
+function intersects(x1, y1, w1, h1, x2, y2, w2, h2) {
+    if (y2 + h2 < y1 ||
+    x2 + w2 < x1 ||
+    x2 > x1 + w1 ||
+    y2 > y1 + h1) {
+        return false;
+    }
+    return true;
+}
 function run() {
     context.fillStyle = "#ccc";
     context.fillRect(0, 0, canvas.width, canvas.height);
@@ -256,6 +316,7 @@ function run() {
     player.update(deltaTime);
     player.draw();
 
+    
     for (var i = 0; i < enemies.length; i++)
     {
         enemies[i].update(deltaTime);
@@ -263,18 +324,63 @@ function run() {
     for (var i = 0; i < enemies.length; i++) {
         enemies[i].draw();
     }
+    
+    for (var j = 0; j < enemies.length; j++) {
+        if (intersects(player.position.x, player.position.y, TILE, TILE,
+         enemies[j].position.x, enemies[j].position.y, TILE, TILE) == true) {
+            enemies.splice(j, 1);
+            lives--;
+        player.position.set(9 * TILE, 0 * TILE) 
+        }
+    }
+    var hit = false;
+    for (var i = 0; i < bullets.length; i++) {
+        bullets[i].update(deltaTime);
+        if (bullets[i].position.x - worldOffsetX < 0 ||
+        bullets[i].position.x - worldOffsetX > SCREEN_WIDTH) {
+            hit = true;
+        }
+        for (var j = 0; j < enemies.length; j++) {
+            if (intersects(bullets[i].position.x, bullets[i].position.y, TILE, TILE,
+             enemies[j].position.x, enemies[j].position.y, TILE, TILE) == true) {
+                // kill both the bullet and the enemy
+                enemies.splice(j, 1);
+                hit = true;
+                // increment the player score
+                score += 1;
+                break;
+            }
+        }
+        if (hit == true) {
+            bullets.splice(i, 1);
+            break;
+        }
+    }
 
     context.fillStyle = "blue";
     context.font = "32px Arial";
-    var scoreText = "Score: " + score;
-    context.fillText(scoreText, SCREEN_WIDTH - 140, 35);
+    var scoreText = "Score: " + score.toFixed(0);
+    context.fillText(scoreText, SCREEN_WIDTH - 200, 35);
+
+    context.fillStyle = "blue";
+    context.font = "32px Arial";
+    var timerText = "Time left: " + timer.toFixed(0);
+    context.fillText(timerText, SCREEN_WIDTH - 200, 70);
+
+
+    timer -= deltaTime;
+    score += deltaTime * 0.5;
+
+    if (timer < 0)
+    {
+        gameState = STATE_GAMEOVER;
+    }
 
     for (var i = 0; i < lives; i++)
     {
-        context.drawImage(heartImage, 20 + ((heartImage.width + 2) * i), 10);
+        context.drawImage(heartImage, 60 + ((heartImage.width + 20) * i), 10, 30, 30);
+      
     }
-
-
     // update the frame counter 
     fpsTime += deltaTime;
     fpsCount++;
@@ -288,6 +394,17 @@ function run() {
     context.fillStyle = "#f00";
     context.font = "14px Arial";
     context.fillText("FPS: " + fps, 5, 20, 100);
+
+    switch (gameState) {
+        case STATE_SPLASH:
+            runSplash(deltaTime);
+            break;
+        case STATE_GAMEOVER:
+            runGameOver(deltaTime);
+            break;
+    }
+
+    
 }
 
 initialize();

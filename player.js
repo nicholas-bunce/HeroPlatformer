@@ -214,4 +214,13 @@ Player.prototype.update = function (deltaTime) {
 Player.prototype.draw = function ()
 {
     this.sprite.draw(context, this.position.x - worldOffsetX, this.position.y);
+    if (player.position.y > canvas.height) {
+        lives--;
+        score--;
+        player.position.set(9 * TILE, 0 * TILE)
+    }
+    if (lives == 0) {
+        gameState = STATE_GAMEOVER;
+    }
+  
 }
