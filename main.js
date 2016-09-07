@@ -29,8 +29,9 @@ function getDeltaTime() {
 var STATE_SPLASH = 0;
 var STATE_GAME = 1;
 var STATE_GAMEOVER = 2;
+var STATE_GAMEWIN = 3;
 
-var timer = 100;
+var timer = 120;
 
 var gameState = STATE_SPLASH;
 
@@ -43,7 +44,7 @@ var SCREEN_HEIGHT = canvas.height;
 
 
 var score = 0;
-var lives = 3;
+var lives = 8;
 
 // some variables to calculate the Frames Per Second (FPS - this tells use
 // how fast our game is running, and allows us to make the game run at a 
@@ -83,7 +84,7 @@ var ENEMY_MAXDX = METER * 5;
 var ENEMY_ACCEL = ENEMY_MAXDX * 2;
 
 var enemies = [];
-var bullets = [];
+
 var LAYER_COUNT = 3;
 var LAYER_BACKGROUND = 0;
 var LAYER_PLATFORMS = 1;
@@ -104,6 +105,9 @@ var enemy = new Enemy();
 
 var jungle = document.createElement("img");
 jungle.src = "jungle.png";
+
+var youWin = document.createElement("img");
+youWin.src = "youWin.png"
 
 var heartImage = document.createElement("img");
 heartImage.src = "heartImage.png";
@@ -148,6 +152,13 @@ function runGameOver(deltaTime) {
         context.font = "bold 24px Arial";
         context.fillText("Your time has run out!", 200, 200);
     }
+    musicBackground.stop();
+}
+function runGameWin(deltaTime) {
+    splashTimerTwo -= deltaTime;
+
+    context.drawImage(youWin, 0, 0, canvas.width, canvas.height);
+    
     musicBackground.stop();
 }
 function cellAtPixelCoord(layer, x, y) {
@@ -239,7 +250,7 @@ var cells = []; // the array that holds our simplified collision data
 
 var musicBackground;
 var sfxFire;
-
+var bullets = [];
 function initialize() {
     for (var layerIdx = 0; layerIdx < LAYER_COUNT; layerIdx++) { // initialize the collision map
         cells[layerIdx] = [];
@@ -296,6 +307,25 @@ function initialize() {
             idx++;
         }
     }
+    // initialize trigger layer in collision map
+    cells[LAYER_OBJECT_TRIGGERS] = [];
+    idx = 0;
+    for (var y = 0; y < level1.layers[LAYER_OBJECT_TRIGGERS].height; y++) {
+        cells[LAYER_OBJECT_TRIGGERS][y] = [];
+        for (var x = 0; x < level1.layers[LAYER_OBJECT_TRIGGERS].width; x++) {
+            if (level1.layers[LAYER_OBJECT_TRIGGERS].data[idx] != 0) {
+                cells[LAYER_OBJECT_TRIGGERS][y][x] = 1;
+                cells[LAYER_OBJECT_TRIGGERS][y - 1][x] = 1;
+                cells[LAYER_OBJECT_TRIGGERS][y - 1][x + 1] = 1;
+                cells[LAYER_OBJECT_TRIGGERS][y][x + 1] = 1;
+            }
+            else if (cells[LAYER_OBJECT_TRIGGERS][y][x] != 1) {
+                // if we haven't set this cell's value, then set it to 0 now
+                cells[LAYER_OBJECT_TRIGGERS][y][x] = 0;
+            }
+            idx++;
+        }
+    }
 }
 function intersects(x1, y1, w1, h1, x2, y2, w2, h2) {
     if (y2 + h2 < y1 ||
@@ -315,7 +345,6 @@ function run() {
     drawMap();
     player.update(deltaTime);
     player.draw();
-
     
     for (var i = 0; i < enemies.length; i++)
     {
@@ -325,6 +354,7 @@ function run() {
         enemies[i].draw();
     }
     
+
     for (var j = 0; j < enemies.length; j++) {
         if (intersects(player.position.x, player.position.y, TILE, TILE,
          enemies[j].position.x, enemies[j].position.y, TILE, TILE) == true) {
@@ -356,6 +386,7 @@ function run() {
             break;
         }
     }
+    
 
     context.fillStyle = "blue";
     context.font = "32px Arial";
@@ -401,6 +432,9 @@ function run() {
             break;
         case STATE_GAMEOVER:
             runGameOver(deltaTime);
+            break;
+        case STATE_GAMEWIN:
+            runGameWin(deltaTime);
             break;
     }
 
