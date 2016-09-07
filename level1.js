@@ -52,7 +52,7 @@ var level1 = { "height":15,
         {
          "columns":14,
          "firstgid":1,
-         "image":"..\/..\/Documents\/Platformer\/tileset.png",
+         "image":"tileset.png",
          "imageheight":1024,
          "imagewidth":1024,
          "margin":2,

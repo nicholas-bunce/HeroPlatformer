@@ -260,7 +260,9 @@ function run() {
     {
         enemies[i].update(deltaTime);
     }
-    enemy.draw();
+    for (var i = 0; i < enemies.length; i++) {
+        enemies[i].draw();
+    }
 
     context.fillStyle = "blue";
     context.font = "32px Arial";
